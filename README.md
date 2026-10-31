@@ -121,7 +121,8 @@ Regra do dono (31/10): **guardar sempre todo o material que o escritório manda*
   - Fotos dos sócios: 556 px de largura, ~165 ppi no tamanho impresso. Para a gráfica, o ideal são os originais em maior resolução.
 - **Folder de soluções (A3), 31/10:**
   - Mesma capa, contracapa e base.
-  - 2|3: PPS. Foto da família e o quadro “sem × com planejamento”.
+  - 2|3: PPS. Foto da família, o quadro “sem × com planejamento” e o **Elton** como quem conduz (é a área dele).
+    Assim cada sócio aparece junto das soluções dele: o Elton no PPS e o Michel no comercial e no treinamento.
   - 4|5: PEC. Foto do prédio e a escada das sete etapas.
   - 6|7: Michel, executivo e consultor: os números, a formação, o livro, a atuação nacional e a evolução de negócios, os formatos in-company.
   - O conteúdo saiu dos anexos de 31/10 (`fontes/`). Não usamos a imagem com marca d’água Freepik da lâmina do PEC.
