@@ -179,7 +179,7 @@ def bloco(usados):
             continue
         simbolos.append(f'<symbol id="dc-{nome}" viewBox="0 {y0} {w:.3f} {y1 - y0}"><g fill="currentColor">{paths}</g></symbol>')
         regras.append(f".dc-{nome}{{display:block;aspect-ratio:{w:.3f}/{y1 - y0};width:auto;overflow:visible}}")
-    return ("<!--assinatura-->\n<!-- gerado por logo/assinatura.py — não editar à mão -->\n"
+    return ("<!--assinatura-->\n<!-- gerado por dawrahecarmona/logo/assinatura.py — não editar à mão -->\n"
             "<style>" + "".join(regras) + "</style>\n"
             '<svg width="0" height="0" style="position:absolute" aria-hidden="true">' + "".join(simbolos) + "</svg>\n"
             "<!--/assinatura-->")
