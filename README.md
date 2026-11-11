@@ -3,6 +3,8 @@
 Material do **escritório** (não da AEVUM). Começou em 2026-10-26 a pedido dos sócios; revisão grande em 2026-10-31
 (logo oficial em The Seasons, folders impressos A3 e manual da marca).
 
+Repositório próprio desde 2026-11-10. Antes ficava em `marca/dawrahecarmona/` do repositório `aevum`, e o histórico veio junto.
+
 | Arquivo | O que é |
 |---|---|
 | `index.html` | Novo site de `dawrahecarmona.com.br`. Publicável como está, junto com `termos.html` e `img/`. |
@@ -20,9 +22,9 @@ Material do **escritório** (não da AEVUM). Começou em 2026-10-26 a pedido dos
 ## Para enviar
 
 ```
-python3 marca/dawrahecarmona/gerar-envio.py             # tudo
-python3 marca/dawrahecarmona/gerar-envio.py folder-a3   # só os folders impressos
-python3 marca/dawrahecarmona/gerar-envio.py manual      # só o manual (usa os PDFs dos folders)
+python3 gerar-envio.py             # tudo
+python3 gerar-envio.py folder-a3   # só os folders impressos
+python3 gerar-envio.py manual      # só o manual (usa os PDFs dos folders)
 ```
 
 - `envio/Dawrah-Carmona-apresentacao.pdf`: o PDF da apresentação. Segue como a opção digital.
@@ -37,9 +39,7 @@ python3 marca/dawrahecarmona/gerar-envio.py manual      # só o manual (usa os P
   - Para atualizar o link, republique a partir deste mesmo arquivo.
   - O link é privado: quem libera o acesso é o dono, pelo menu Share.
 
-Prévia local (`.claude/launch.json`):
-- `site-dawrahecarmona`: esta pasta, na porta 8093.
-- `marca`: a pasta `marca/` inteira, na porta 8094.
+Prévia local: `.claude/launch.json` → `site-dawrahecarmona`, este repositório na porta 8093.
 
 ## Logo oficial (`logo/`)
 
@@ -52,9 +52,9 @@ A The Seasons é comercial e não está instalada. Por isso guardamos o **contor
 
 | Comando | O que faz |
 |---|---|
-| `python3 marca/dawrahecarmona/logo/assinatura.py arquivos` | Gera os arquivos prontos: `dawrah-carmona-logo-{navy,branco}` (logo oficial) e `dawrah-carmona-nome-{navy,branco}` (só o nome), em `.svg` e `.png` de 3000 px, com fundo transparente. |
-| `python3 marca/dawrahecarmona/logo/assinatura.py injetar A.html …` | Põe o logo dentro do HTML como símbolos SVG (`#dc-logo`, `#dc-nome`, `#dc-2l`, `#dc-2c`, `#dc-l1`, `#dc-l2`, `#dc-sub`). Entram só os que o arquivo usa. |
-| `python3 marca/dawrahecarmona/logo/assinatura.py extrair` | Refaz o `contornos.svg` a partir do Canva. Só se o logo mudar. |
+| `python3 logo/assinatura.py arquivos` | Gera os arquivos prontos: `dawrah-carmona-logo-{navy,branco}` (logo oficial) e `dawrah-carmona-nome-{navy,branco}` (só o nome), em `.svg` e `.png` de 3000 px, com fundo transparente. |
+| `python3 logo/assinatura.py injetar A.html …` | Põe o logo dentro do HTML como símbolos SVG (`#dc-logo`, `#dc-nome`, `#dc-2l`, `#dc-2c`, `#dc-l1`, `#dc-l2`, `#dc-sub`). Entram só os que o arquivo usa. |
+| `python3 logo/assinatura.py extrair` | Refaz o `contornos.svg` a partir do Canva. Só se o logo mudar. |
 
 Para usar o logo num HTML:
 - O arquivo precisa de um bloco `<!--assinatura--><!--/assinatura-->`.
@@ -65,7 +65,7 @@ Para usar o logo num HTML:
 Arquivos que já usam o logo:
 - `index.html`, `termos.html` e `folder.html`;
 - os dois folders A3 e o manual;
-- fora desta pasta, `../aevumlegacy-site.html` e `../og.html`.
+- no repositório `aevum`, `marca/aevumlegacy-site.html` e `marca/og.html`.
 
 Se o logo mudar, rode `injetar` em todos esses arquivos e gere os envios de novo.
 
@@ -80,7 +80,7 @@ Regra do dono (31/10): **guardar sempre todo o material que o escritório manda*
 | `2026-10-31-whatsapp-michel-revisao-folder.png` | O print do pedido do Michel para as páginas 2 e 3 do folder: só as bios, e o degradê da foto até o branco. |
 | `2026-10-31-PEC-planejamento-estrategico-comercial.pdf` · `…-PPS-planejamento-patrimonial-sucessorio.pdf` | As lâminas do Canva das duas soluções. São a base do folder de soluções. |
 | `2026-10-31-michel-apresentacao-profissional.pdf` | “Apresentação Profissional — Executivo e Consultor”, do Michel. Tem os números, a formação, o livro e a atuação. |
-| `logo-oficial-dawrah-carmona.png` | O logo oficial, copiado de `design/clients/carmona-dawrah/04-design/brand/`. |
+| `logo-oficial-dawrah-carmona.png` | O logo oficial, copiado de `design/clients/carmona-dawrah/04-design/brand/` (repositório `aevum`). |
 
 ## Decisões
 
@@ -91,7 +91,7 @@ Regra do dono (31/10): **guardar sempre todo o material que o escritório manda*
   - sempre o desenho oficial, em uma cor só;
   - o “&” não muda de cor;
   - o nome nunca é redigitado em outra fonte.
-- **Site da AEVUM (`../aevumlegacy-site.html`):**
+- **Site da AEVUM (`marca/aevumlegacy-site.html`, no repositório `aevum`):**
   - o conteúdo está aprovado; ali só mudam a cor e a fonte;
   - em 31/10 o verde virou latão e o nome do escritório passou para o logo.
 - **Rodapé e Termos:** CNPJ do escritório, 55.927.541/0001-51, com a razão social Dawrah Carmona e Associados Ltda.

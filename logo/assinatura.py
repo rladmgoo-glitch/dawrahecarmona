@@ -5,9 +5,9 @@
 A fonte The Seasons é comercial e não está instalada. Por isso guardamos o CONTORNO dos glifos,
 tirado da capa do PDF do Canva que o escritório mandou. Esse contorno é o desenho exato do logo.
 
-    python3 marca/dawrahecarmona/logo/assinatura.py extrair     # Canva → contornos.svg (só se o logo mudar)
-    python3 marca/dawrahecarmona/logo/assinatura.py arquivos    # SVG e PNG do logo nesta pasta
-    python3 marca/dawrahecarmona/logo/assinatura.py injetar A.html B.html ...
+    python3 logo/assinatura.py extrair     # Canva → contornos.svg (só se o logo mudar)
+    python3 logo/assinatura.py arquivos    # SVG e PNG do logo nesta pasta
+    python3 logo/assinatura.py injetar A.html B.html ...
 
 "injetar" troca o bloco entre <!--assinatura--> e <!--/assinatura--> por um <svg> oculto com os símbolos
 (#dc-logo = o logo oficial; #dc-nome = o nome numa linha; #dc-2l / #dc-2c = em duas linhas, à esquerda ou
@@ -179,7 +179,7 @@ def bloco(usados):
             continue
         simbolos.append(f'<symbol id="dc-{nome}" viewBox="0 {y0} {w:.3f} {y1 - y0}"><g fill="currentColor">{paths}</g></symbol>')
         regras.append(f".dc-{nome}{{display:block;aspect-ratio:{w:.3f}/{y1 - y0};width:auto;overflow:visible}}")
-    return ("<!--assinatura-->\n<!-- gerado por marca/dawrahecarmona/logo/assinatura.py — não editar à mão -->\n"
+    return ("<!--assinatura-->\n<!-- gerado por logo/assinatura.py — não editar à mão -->\n"
             "<style>" + "".join(regras) + "</style>\n"
             '<svg width="0" height="0" style="position:absolute" aria-hidden="true">' + "".join(simbolos) + "</svg>\n"
             "<!--/assinatura-->")

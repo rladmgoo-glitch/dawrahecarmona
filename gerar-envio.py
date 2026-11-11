@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Gera as versões "para enviar" (WhatsApp / e-mail) do material da Dawrah, Carmona & Associados.
 
-    python3 marca/dawrahecarmona/gerar-envio.py             tudo
-    python3 marca/dawrahecarmona/gerar-envio.py folder-a3   só os folders impressos
-    python3 marca/dawrahecarmona/gerar-envio.py manual      só o manual da marca (usa os PDFs dos folders)
+    python3 gerar-envio.py             tudo
+    python3 gerar-envio.py folder-a3   só os folders impressos
+    python3 gerar-envio.py manual      só o manual da marca (usa os PDFs dos folders)
 
-Saída em marca/dawrahecarmona/envio/:
+Saída em envio/:
   Dawrah-Carmona-site.html         o site num arquivo só: fotos embutidas como data: URI e os
                                    Termos de Uso dentro do rodapé (<details>), sem depender de img/
                                    nem de termos.html. Abre direto no celular.
