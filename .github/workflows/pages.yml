@@ -20,6 +20,7 @@ on:
       - site-base.css
       - site.js
       - img/**
+      - CNAME
       - montar-site.py
       - conferir.py
       - .github/workflows/pages.yml
