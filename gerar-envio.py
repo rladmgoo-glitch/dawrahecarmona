@@ -6,9 +6,12 @@
     python3 gerar-envio.py manual      só o manual da marca (usa os PDFs dos folders)
 
 Saída em envio/:
-  Dawrah-Carmona-site.html         o site num arquivo só: fotos embutidas como data: URI e os
-                                   Termos de Uso dentro do rodapé (<details>), sem depender de img/
-                                   nem de termos.html. Abre direto no celular.
+  Dawrah-Carmona-site.html         o site num arquivo só, e ainda navegando por páginas: a home e
+                                   as três soluções continuam páginas separadas, e o menu e os cartões
+                                   trocam de uma para outra em vez de rolar tudo num scroll só. Fotos
+                                   embutidas como data: URI e os Termos de Uso dentro do rodapé
+                                   (<details>). Não depende de site-base.css, site.js, img/ nem
+                                   termos.html; abre direto no celular, sem internet.
   Dawrah-Carmona-apresentacao.pdf  folder.html impresso em A4 pelo Chrome headless (a versão digital).
   Dawrah-Carmona-folder-*A3-*.pdf  os folders impressos (folder-a3.html, institucional; folder-solucoes-a3.html,
                                    PPS/PEC/Michel): "espelhos" (aberto, A3 deitado, para aprovar) e "grafica"
@@ -19,7 +22,8 @@ Saída em envio/:
                                    celular e sem o formulário de e-mail (mailto não é confiável dentro do
                                    Artifact; e-mail, WhatsApp e Instagram seguem visíveis).
 
-O site publicável continua sendo a pasta (index.html + termos.html + img/); este script não a altera.
+O site publicável continua sendo a pasta (index.html, 360/, workshop/, aevum/, termos.html,
+site-base.css, site.js e img/); este script não a altera.
 """
 import base64
 import html
@@ -40,11 +44,21 @@ CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
 
 def data_uri(nome):
-    """JPEG re-encodado mais leve, para o arquivo único caber bem num anexo."""
-    im = Image.open(os.path.join(AQUI, "img", nome)).convert("RGB")
+    """A foto re-encodada mais leve, para o arquivo único caber bem num anexo.
+    As fotos comuns viram JPEG; os recortes com fundo transparente (os retratos
+    do workshop) seguem em WebP, que guarda o canal alfa."""
+    im = Image.open(os.path.join(AQUI, "img", nome))
+    alfa = im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info)
+    buf = io.BytesIO()
+    if alfa:
+        im = im.convert("RGBA")
+        if im.height > 1100:
+            im = im.resize((round(im.width * 1100 / im.height), 1100), Image.LANCZOS)
+        im.save(buf, "WEBP", quality=80, method=6)
+        return "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode()
+    im = im.convert("RGB")
     if im.width > 1300:
         im = im.resize((1300, round(im.height * 1300 / im.width)), Image.LANCZOS)
-    buf = io.BytesIO()
     im.save(buf, "JPEG", quality=74, optimize=True, progressive=True)
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
@@ -80,22 +94,136 @@ footer .terms .tx a{color:var(--bone)}
 """
 
 
+PAGINAS = [("360", "Consultoria Empresarial 360º"),
+           ("workshop", "Workshop"),
+           ("aevum", "AEVUM · Private Legacy Office")]
+"""As soluções, cada uma na sua pasta, na ordem em que entram no arquivo único."""
+
+CSS_PAGINAS = """
+/* No arquivo único cada página do site continua sendo uma página: o menu e os
+   cartões trocam de página em vez de rolar tudo num scroll só. */
+.pagina{display:none}
+.pagina.ativa{display:block}
+"""
+
+JS_PAGINAS = """
+(function(){
+  var paginas=document.querySelectorAll('.pagina');
+  function mostra(id,ancora){
+    var achou=false;
+    paginas.forEach(function(p){
+      var e=(p.id===id); p.classList.toggle('ativa',e); achou=achou||e;
+    });
+    if(!achou)return false;
+    var alvo=ancora&&document.getElementById(ancora);
+    if(alvo){alvo.scrollIntoView();}else{window.scrollTo(0,0);}
+    return true;
+  }
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href^="#pg-"]');
+    if(!a)return;
+    e.preventDefault();
+    mostra(a.getAttribute('href').slice(1),a.getAttribute('data-ancora'));
+    var nav=document.getElementById('nav');
+    if(nav)nav.classList.remove('open');
+  });
+  if(location.hash.indexOf('#pg-')===0)mostra(location.hash.slice(1));
+})();
+"""
+
+
+def miolo(pasta):
+    """O <main> de uma página de solução, com a trilha e sem o rodapé de navegação."""
+    s = open(os.path.join(AQUI, pasta, "index.html"), encoding="utf-8").read()
+    m = re.search(r"<main([^>]*)>(.*?)</main>", s, re.S)
+    atributos, corpo = m.group(1), m.group(2)
+    corpo = re.sub(r'\s*<section class="outras">.*?</section>', "", corpo, count=1, flags=re.S)
+    assert "outras-grid" not in corpo
+    # a página pode trazer a própria identidade numa classe do <main> (o workshop traz)
+    if atributos.strip():
+        corpo = f"<div{atributos}>{corpo}\n</div>"
+    trilha = re.search(r'<nav class="crumb".*?</nav>', s, re.S)
+    estilo = re.search(r"<style>(.*?)</style>", s, re.S)
+    return (trilha.group(0) if trilha else "") + "\n" + corpo, (estilo.group(1).strip() if estilo else "")
+
+
+def so_ancoras(s):
+    """Os links entre páginas viram #pg-<pasta>; o que vem depois do # vira data-ancora.
+    Serve para o corpo das páginas, onde uma âncora solta (#proposta) é da própria página."""
+    def troca(m):
+        destino = (m.group(1) or "").replace("../", "").rstrip("/")
+        if destino in ("", "index.html"):
+            destino = "home"
+        extra = ' data-ancora="%s"' % m.group(2) if m.group(2) else ""
+        return 'href="#pg-%s"%s' % (destino, extra)
+
+    return re.sub(r'href="((?:\.\./)?(?:360|workshop|aevum)/|\.\./|index\.html)(?:#([\w-]+))?"', troca, s)
+
+
+def cabecalho_so_ancoras(s):
+    """No cabeçalho (que vem da home) toda âncora é da home: #contato vira a home
+    mais a âncora. #nav é do menu e #dc-… é o logo — esses ficam."""
+    def troca(m):
+        alvo = m.group(1)
+        if alvo == "nav" or alvo.startswith("dc-"):
+            return m.group(0)
+        if alvo == "inicio":
+            return 'href="#pg-home"'
+        return 'href="#pg-home" data-ancora="%s"' % alvo
+
+    return re.sub(r'href="#([\w-]+)"', troca, s)
+
+
 def gerar_site():
-    s = open(os.path.join(AQUI, "index.html"), encoding="utf-8").read()
-    for nome in sorted(set(re.findall(r'img/([\w.-]+\.jpg)', s))):
+    """O site inteiro num arquivo: a home e as páginas de solução continuam páginas,
+    e o menu troca entre elas. As fotos entram como data: URI e os Termos de Uso
+    vão para dentro do rodapé."""
+    home = open(os.path.join(AQUI, "index.html"), encoding="utf-8").read()
+    estilos = [open(os.path.join(AQUI, "site-base.css"), encoding="utf-8").read()]
+    m = re.search(r"<style>(.*?)</style>", home, re.S)
+    estilos.append(m.group(1).strip())
+    home = home.replace(m.group(0), "", 1)
+
+    cabeca = home[:home.index("<body>") + len("<body>")]
+    assinatura = re.search(r"<!--assinatura-->.*?<!--/assinatura-->", home, re.S).group(0)
+    cabecalho = cabecalho_so_ancoras(re.search(r'<header class="top">.*?</header>', home, re.S).group(0))
+    rodape = re.search(r"<footer>.*?</footer>", home, re.S).group(0)
+    corpo_home = re.search(r"<main>(.*?)</main>", home, re.S).group(1)
+
+    partes = ['<div class="pagina ativa" id="pg-home">%s</div>' % corpo_home]
+    for pasta, _ in PAGINAS:
+        corpo, estilo = miolo(pasta)
+        partes.append('<div class="pagina" id="pg-%s">\n%s\n</div>' % (pasta, corpo))
+        if estilo:
+            estilos.append(estilo)
+
+    s = (cabeca + "\n" + assinatura + "\n\n" + cabecalho + "\n\n"
+         + "\n\n".join(partes) + "\n\n" + rodape
+         + '\n<script src="site.js"></script>\n</body></html>\n')
+    s = s.replace('<link rel="stylesheet" href="site-base.css">',
+                  "<style>\n" + "\n".join(estilos) + CSS_PAGINAS + "\n</style>")
+    s = s.replace('<script src="site.js"></script>',
+                  "<script>\n" + open(os.path.join(AQUI, "site.js"), encoding="utf-8").read().strip()
+                  + "\n" + JS_PAGINAS.strip() + "\n</script>")
+    s = so_ancoras(s)
+    sobrou = re.findall(r'href="(?!#|mailto:|https?:|termos\.html)([^"]+)"', s)
+    assert not sobrou, sobrou
+
+    for nome in sorted(set(re.findall(r"img/([\w./-]+\.(?:jpg|png|webp))", s))):
         uri = data_uri(nome)
         s = s.replace(f'src="img/{nome}"', f'src="{uri}"').replace(f"url(img/{nome})", f"url({uri})")
+        s = s.replace(f'src="../img/{nome}"', f'src="{uri}"').replace(f"url(../img/{nome})", f"url({uri})")
     assert "img/" not in s, "sobrou referência a img/"
     link = '<a href="termos.html">Termos de Uso</a>'
-    assert s.count(link) == 1
+    assert s.count(link) == 1, s.count(link)
     s = s.replace(link, '<a href="#termos">Termos de Uso</a>')
     base = re.search(r'(<div class="foot-base">.*?</div>)', s).group(1)
     s = s.replace(base, base + "\n    " + termos_embutidos(), 1)
     s = s.replace("</style>", CSS_TERMOS + "</style>", 1)
     s = s.replace(
         "</body>",
-        "<script>document.querySelector('a[href=\"#termos\"]').addEventListener('click',function(){"
-        "document.getElementById('termos').open=true;});</script>\n</body>",
+        "<script>document.querySelector(\'a[href=\"#termos\"]\').addEventListener(\'click\',function(){"
+        "document.getElementById(\'termos\').open=true;});</script>\n</body>",
         1,
     )
     destino = os.path.join(SAIDA, "Dawrah-Carmona-site.html")

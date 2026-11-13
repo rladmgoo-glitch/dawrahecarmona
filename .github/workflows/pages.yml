@@ -1,0 +1,58 @@
+# Publica o site em dawrahecarmona.com.br pelo GitHub Pages.
+#
+# Vai ao ar só o que montar-site.py põe em _site/ — as páginas, o CSS, o JS, os
+# Termos e as imagens que as páginas pedem. Os folders impressos, o manual da
+# marca e as pastas fontes/ e envio/ ficam no repositório e não são publicados.
+#
+# O e-mail do escritório não passa por aqui: ele vive nos registros MX do domínio,
+# que continuam na Locaweb. O Pages só responde pelos registros A e CNAME do site.
+name: Publica o site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - 360/**
+      - workshop/**
+      - aevum/**
+      - termos.html
+      - site-base.css
+      - site.js
+      - img/**
+      - montar-site.py
+      - conferir.py
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Confere o site
+        run: python3 conferir.py
+
+      - name: Monta a pasta que vai ao ar
+        run: python3 montar-site.py
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: publicacao
+        uses: actions/deploy-pages@v4
