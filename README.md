@@ -7,7 +7,11 @@ Repositório próprio desde 2026-11-10. Antes ficava em `marca/dawrahecarmona/` 
 
 | Arquivo | O que é |
 |---|---|
-| `index.html` | Novo site de `dawrahecarmona.com.br`. Publicável como está, junto com `termos.html` e `img/`. |
+| `index.html` | Home de `dawrahecarmona.com.br`: o escritório, os sócios e os cartões das três soluções. Publicável como está, junto com as páginas abaixo, `site-base.css`, `site.js`, `termos.html` e `img/`. |
+| `360/` · `workshop/` · `aevum/` | Uma pasta por solução, cada uma com o seu `index.html`, para o endereço ficar `dawrahecarmona.com.br/workshop` sem extensão. Cada página abre com a trilha de volta para a home, fecha com a chamada para contato e lista as outras duas. O Workshop traz as duas vertentes, `#vendas` e `#empreendedorismo`, e segue a identidade do próprio produto — preto e dourado, Playfair Display e DM Sans, vindas de `DcaWorkshopApplication`; as fontes estão embutidas, reduzidas aos caracteres da página. **O texto do Workshop é o do site do produto, palavra por palavra: não acrescente formato, capacidade ou condição que não esteja lá.** |
+| `conferir.py` | A cerca: logo presente, links e âncoras que resolvem, imagens que existem, cabeçalho e rodapé iguais, CSS sem uso. Rode antes de publicar ou de gerar o envio. |
+| `site-base.css` | O que as quatro páginas têm em comum (as de pasta chamam `../site-base.css`): a fonte, as cores, tipografia, botões, cabeçalho, rodapé, os cartões da home e os blocos reaproveitados (`.stats`, `.front`, `.fmt`, `.pillars`). O que é de uma página só fica no `<style>` dela. |
+| `site.js` | O menu do celular, o ano do rodapé e o formulário da home. |
 | `termos.html` | Termos de Uso, adaptados do texto da De Paula & Carmona. |
 | `folder.html` | Apresentação A4, 10 páginas. Fonte do PDF (a versão digital). |
 | `folder-a3.html` | Folder institucional impresso: 8 páginas A4 em 2 folhas A3 dobradas. Abre como o folder aberto; com `#grafica` no endereço, mostra as páginas soltas com sangria. |
@@ -16,7 +20,7 @@ Repositório próprio desde 2026-11-10. Antes ficava em `marca/dawrahecarmona/` 
 | `manual-da-marca.html` | Manual da marca (A4, 6 páginas): logo, uso, cores, tipografia, elementos e aplicações. |
 | `logo/` | **Logo oficial** (ver abaixo): SVG e PNG prontos, o contorno-mestre e o script que injeta o logo nos HTML. |
 | `fontes/` | **Todo o material recebido do escritório**, guardado como chegou (PDFs do Canva, prints, logo oficial). Ver abaixo. |
-| `img/` | Fotos: sócios (`michel.jpg`, `elton.jpg`), escritório, prédio, caneta, família, dossiê AEVUM. `img/manual/` = miniaturas do manual (geradas). |
+| `img/` | Fotos: sócios (`michel.jpg`, `elton.jpg`), escritório, prédio, caneta, família, dossiê AEVUM. `img/workshop/` = os recortes da equipe do workshop, em WebP com fundo transparente, vindos do app (`DcaWorkshopApplication/frontend/src/assets/images`). `img/manual/` = miniaturas do manual (geradas). |
 | `gerar-envio.py` | Gera as versões para enviar, em `envio/`. |
 
 ## Para enviar
@@ -41,6 +45,8 @@ python3 gerar-envio.py manual      # só o manual (usa os PDFs dos folders)
 
 Prévia local: `.claude/launch.json` → `site-dawrahecarmona`, este repositório na porta 8093.
 
+**Toda vez que uma página for regerada, reinjete o logo e rode `python3 conferir.py`** — o bloco `<!--assinatura-->` se perde na regeração e a página fica sem o logo, sem erro nenhum.
+
 ## Logo oficial (`logo/`)
 
 O logo do escritório é o de `fontes/logo-oficial-dawrah-carmona.png`:
@@ -58,6 +64,8 @@ A The Seasons é comercial e não está instalada. Por isso guardamos o **contor
 
 Para usar o logo num HTML:
 - O arquivo precisa de um bloco `<!--assinatura--><!--/assinatura-->`.
+- As cinco páginas do site recebem o logo pelo mesmo comando:
+  `python3 logo/assinatura.py injetar index.html 360/index.html workshop/index.html aevum/index.html`.
 - O uso é `<svg class="dc-nome"><use href="#dc-nome"/></svg>`.
 - A cor vem do CSS (`color`), e a altura também.
 - Referência de tamanho: 60 unidades do símbolo = 50 pt de The Seasons.
