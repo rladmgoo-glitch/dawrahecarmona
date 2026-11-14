@@ -5,12 +5,14 @@ Material do **escritório** (não da AEVUM). Começou em 2026-10-26 a pedido dos
 
 Repositório próprio desde 2026-11-10. Antes ficava em `marca/dawrahecarmona/` do repositório `aevum`, e o histórico veio junto.
 
+**O site está no ar em https://dawrahecarmona.com.br desde 2026-11-13**, publicado pelo GitHub Pages a cada push na `main`. Ver [No ar](#no-ar).
+
 | Arquivo | O que é |
 |---|---|
 | `index.html` | Home de `dawrahecarmona.com.br`: o escritório, os sócios e os cartões das três soluções. Publicável como está, junto com as páginas abaixo, `site-base.css`, `site.js`, `termos.html` e `img/`. |
 | `360/` · `workshop/` · `aevum/` | Uma pasta por solução, cada uma com o seu `index.html`, para o endereço ficar `dawrahecarmona.com.br/workshop` sem extensão. Cada página abre com a trilha de volta para a home, fecha com a chamada para contato e lista as outras duas. O Workshop traz as duas vertentes, `#vendas` e `#empreendedorismo`, e segue a identidade do próprio produto — preto e dourado, Playfair Display e DM Sans, vindas de `DcaWorkshopApplication`; as fontes estão embutidas, reduzidas aos caracteres da página. **O texto do Workshop é o do site do produto, palavra por palavra: não acrescente formato, capacidade ou condição que não esteja lá.** |
 | `conferir.py` | A cerca: logo presente, links e âncoras que resolvem, imagens que existem, cabeçalho e rodapé iguais, CSS sem uso. Rode antes de publicar ou de gerar o envio. |
-| `site-base.css` | O que as quatro páginas têm em comum (as de pasta chamam `../site-base.css`): a fonte, as cores, tipografia, botões, cabeçalho, rodapé, os cartões da home e os blocos reaproveitados (`.stats`, `.front`, `.fmt`, `.pillars`). O que é de uma página só fica no `<style>` dela. |
+| `site-base.css` | O que as quatro páginas têm em comum (as de pasta chamam `../site-base.css`): a fonte, as cores, tipografia, botões, cabeçalho, rodapé, os cartões da home (`.sols` / `.sol-card`) e os blocos reaproveitados (`.stats`, `.front`, `.fmt`, `.pillars`). O que é de uma página só fica no `<style>` dela. |
 | `site.js` | O menu do celular, o ano do rodapé e o formulário da home. |
 | `termos.html` | Termos de Uso, adaptados do texto da De Paula & Carmona. |
 | `folder.html` | Apresentação A4, 10 páginas. Fonte do PDF (a versão digital). |
@@ -22,6 +24,9 @@ Repositório próprio desde 2026-11-10. Antes ficava em `marca/dawrahecarmona/` 
 | `fontes/` | **Todo o material recebido do escritório**, guardado como chegou (PDFs do Canva, prints, logo oficial). Ver abaixo. |
 | `img/` | Fotos: sócios (`michel.jpg`, `elton.jpg`), escritório, prédio, caneta, família, dossiê AEVUM. `img/workshop/` = os recortes da equipe do workshop, em WebP com fundo transparente, vindos do app (`DcaWorkshopApplication/frontend/src/assets/images`). `img/manual/` = miniaturas do manual (geradas). |
 | `gerar-envio.py` | Gera as versões para enviar, em `envio/`. |
+| `montar-site.py` | Monta em `_site/` exatamente o que vai ao ar: as cinco páginas, o CSS, o JS e só as imagens que elas pedem. Para na hora se aparecer arquivo não previsto — é o que mantém os folders, o manual, `fontes/` e `envio/` fora do site. `_site/` não é versionado. |
+| `.github/workflows/pages.yml` | Publica: a cada push na `main` roda `conferir.py`, depois `montar-site.py`, e sobe `_site/` para o Pages. Só dispara nos caminhos listados nele — **uma página nova precisa entrar nessa lista**. |
+| `CNAME` | O domínio, `dawrahecarmona.com.br`. Está no repositório porque `montar-site.py` o copia para `_site/`, mas quem configura o domínio é a API do Pages (ver abaixo). |
 
 ## Para enviar
 
@@ -46,6 +51,44 @@ python3 gerar-envio.py manual      # só o manual (usa os PDFs dos folders)
 Prévia local: `.claude/launch.json` → `site-dawrahecarmona`, este repositório na porta 8093.
 
 **Toda vez que uma página for regerada, reinjete o logo e rode `python3 conferir.py`** — o bloco `<!--assinatura-->` se perde na regeração e a página fica sem o logo, sem erro nenhum.
+
+## No ar
+
+O site é publicado pelo **GitHub Pages** a partir da `main` deste repositório. Todo push na `main` que toque um dos
+caminhos listados em `.github/workflows/pages.yml` roda `conferir.py`, monta `_site/` com `montar-site.py` e põe no
+ar. Não há passo manual nem build local para commitar.
+
+Vai ao ar **só** o que `montar-site.py` copia: as cinco páginas, o CSS, o JS e as imagens que elas pedem. Os folders
+impressos, o manual da marca, `fontes/` e `envio/` ficam no repositório e não são publicados — se mexer no script,
+confirme que continuam dando 404 no domínio. O repositório é público: os PDFs de `fontes/` não aparecem no site,
+mas são visíveis no GitHub para quem tiver o endereço do repositório (o dono foi avisado em 13/11 e seguiu assim).
+
+### Duas armadilhas do Pages
+
+- **O arquivo `CNAME` não configura o domínio** quando a publicação é por Actions (`build_type=workflow`); isso só
+  vale no modo antigo do Pages. O domínio se registra pela API:
+
+  ```bash
+  gh api -X PUT repos/rladmgoo-glitch/dawrahecarmona/pages -f cname=dawrahecarmona.com.br
+  ```
+
+  ```bash
+  gh api -X PUT repos/rladmgoo-glitch/dawrahecarmona/pages -F https_enforced=true
+  ```
+
+  O booleano vai com `-F`; com `-f` o GitHub recusa com 422. O certificado sai alguns minutos depois.
+- **O `CNAME` precisa estar na lista de `paths` do workflow.** Sem isso, ligar ou desligar o domínio não republica
+  nada e parece que o site não reage.
+
+### DNS e e-mail — o que não se toca
+
+O DNS continua na **Locaweb**. Mudaram só:
+
+- os quatro registros `A` do ápice, para `185.199.108.153`, `185.199.109.153`, `185.199.110.153` e `185.199.111.153`;
+- o `www`, apontando para o ápice.
+
+**Não mexer em `MX`, no TXT do SPF, nem em `webmail`, `pop`, `smtp`, `imap`, `mail` e `autodiscover`** — é por eles
+que o e-mail do escritório funciona. O Pages não tem nada a ver com e-mail: responde só pelo site.
 
 ## Logo oficial (`logo/`)
 
@@ -102,6 +145,12 @@ Regra do dono (31/10): **guardar sempre todo o material que o escritório manda*
 - **Site da AEVUM (`marca/aevumlegacy-site.html`, no repositório `aevum`):**
   - o conteúdo está aprovado; ali só mudam a cor e a fonte;
   - em 31/10 o verde virou latão e o nome do escritório passou para o logo.
+- **Cartões das soluções (home), 14/11:** cada um é um cartão de verdade — borda, sombra, 22 px de respiro entre
+  eles e uma barra de 3 px no topo na cor do produto (navy no 360º, dourado no Workshop, latão na AEVUM). Antes eram
+  papel quase branco sobre bone, separados por um fio de 1 px, e se confundiam com o fundo. O Workshop vem em preto
+  e dourado, a identidade do próprio produto.
+  - As classes são `.sols` e `.sol-card`. **Não usar `.card` / `.cards`:** a página do Workshop usa esses nomes
+    dentro de `.wk-dark` e as regras do `site-base.css` vazam para lá.
 - **Rodapé e Termos:** CNPJ do escritório, 55.927.541/0001-51, com a razão social Dawrah Carmona e Associados Ltda.
 - **Bios dos sócios:** texto enviado pelo escritório.
   - Michel: Sócio, administrador com MBA em Marketing (FGV). Números da trajetória e livro “Sr. Hochade” tirados da apresentação dele (31/10).
@@ -134,4 +183,4 @@ Regra do dono (31/10): **guardar sempre todo o material que o escritório manda*
   - 4|5: PEC. Foto do prédio e a escada das sete etapas.
   - 6|7: Michel, executivo e consultor: os números, a formação, o livro, a atuação nacional e a evolução de negócios, os formatos in-company.
   - O conteúdo saiu dos anexos de 31/10 (`fontes/`). Não usamos a imagem com marca d’água Freepik da lâmina do PEC.
-- **Pendente:** o site ainda não está no domínio. O DNS e, provavelmente, o e-mail `contato@` estão na Locaweb; não mexer sem combinar.
+- **Domínio:** resolvido em 13/11 — o site foi para o GitHub Pages e o e-mail ficou onde estava, na Locaweb. Ver [No ar](#no-ar).
